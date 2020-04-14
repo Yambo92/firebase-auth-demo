@@ -69,8 +69,11 @@ signupForm.addEventListener('submit', (e) => {
             const modal = document.querySelector('#modal-signup');
             M.Modal.getInstance(modal).close();
             signupForm.reset();
+            signupForm.querySelector('.error').innerHTML = ''
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+            signupForm.querySelector('.error').innerHTML = error.message
+        });
 });
 
 //logout 
@@ -100,9 +103,11 @@ loginForm.addEventListener('submit', (e) => {
             const modal = document.querySelector('#modal-login');
             M.Modal.getInstance(modal).close();
             loginForm.reset();
-            
+            loginForm.querySelector('.error').innerHTML = ''
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+            loginForm.querySelector('.error').innerHTML = error.message
+        })
 })
 
 
