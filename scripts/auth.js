@@ -1,14 +1,26 @@
-
+// add Admin cloud function
+const adminForm = document.querySelector('.admin-actions');
+adminForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const adminEmail =document.querySelector('#admin-email').value;
+    const addAdminRole = functions.httpsCallable('addAdminRole');
+    addAdminRole({email: adminEmail}).then(result => {
+        console.log(result);
+    }).catch(error => console.log(error.message))
+})
 
 //实时监听
 //listen for auth status change
 auth.onAuthStateChanged(user => {
     if (user) {
+        user.getIdTokenResult().then(idTokenResult => {
+            user.admin = idTokenResult.claims.admin;
+            setupUI(user);
+        })
         //获取database data 
         //onSnapshot 时事抓拍数据快照
         db.collection('guides').onSnapshot((spanshot) => {
             setupGuides(spanshot.docs);
-            setupUI(user);
         },
         (err) => console.log(err.message)
         )
