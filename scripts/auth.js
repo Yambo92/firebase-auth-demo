@@ -1,19 +1,41 @@
 
 
-
+//实时监听
 //listen for auth status change
 auth.onAuthStateChanged(user => {
     if (user) {
-        //获取database data
-        db.collection('guides').get().then((spanshot) => {
+        //获取database data 
+        //onSnapshot 时事抓拍数据快照
+        db.collection('guides').onSnapshot((spanshot) => {
             setupGuides(spanshot.docs);
             setupUI(user);
-        })
+        },
+        (err) => console.log(err.message)
+        )
     } else {
         setupUI();
         setupGuides([])
     }
     
+})
+
+//create new guide
+const createForm = document.querySelector('#create-form');
+createForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    db.collection('guides').add({
+        title: createForm['title'].value,
+        content: createForm['content'].value
+    }).then(() => {
+        //关闭modal resetForm
+        const modal = document.querySelector('#modal-create')
+        M.Modal.getInstance(modal).close();
+        createForm.reset();
+    }).catch(err => {
+        console.log(err.message);
+        
+    })
 })
 
 // signup
@@ -28,6 +50,10 @@ signupForm.addEventListener('submit', (e) => {
     //sign up the user
     auth.createUserWithEmailAndPassword(email, password)
         .then(cred => {
+            return db.collection('users').doc(cred.user.uid).set({
+                bio: signupForm['signup-bio'].value
+            })
+        }).then(() => {
             const modal = document.querySelector('#modal-signup');
             M.Modal.getInstance(modal).close();
             signupForm.reset();
